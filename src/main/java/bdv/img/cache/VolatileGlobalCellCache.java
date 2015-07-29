@@ -42,13 +42,9 @@ import bdv.img.cache.VolatileImgCells.CellCache;
 
 public class VolatileGlobalCellCache implements Cache
 {
-	private final int maxNumTimepoints;
-
-	private final int maxNumSetups;
-
 	private final int maxNumLevels;
 
-	class Key
+	static class Key
 	{
 		private final int timepoint;
 
@@ -71,8 +67,12 @@ public class VolatileGlobalCellCache implements Cache
 			this.cellDims = cellDims;
 			this.cellMin = cellMin;
 
-			final long value = ( ( index * maxNumLevels + level ) * maxNumSetups + setup ) * maxNumTimepoints + timepoint;
-			hashcode = ( int ) ( value ^ ( value >>> 32 ) );
+			int value = 17;
+			value = 31 * value + index;
+			value = 31 * value + level;
+			value = 31 * value + setup;
+			value = 31 * value + timepoint;
+			hashcode = value;
 		}
 
 		@Override
@@ -312,24 +312,19 @@ public class VolatileGlobalCellCache implements Cache
 
 	private final CacheIoTiming cacheIoTiming;
 
+	@Deprecated
+	public VolatileGlobalCellCache( final int maxNumTimepoints, final int maxNumSetups, final int maxNumLevels, final int numFetcherThreads )
+	{
+		this( maxNumLevels, numFetcherThreads );
+	}
+
 	/**
-	 *
-	 * @param maxNumTimepoints
-	 *            the highest occurring timepoint id plus 1. This is only used to
-	 *            compute a hashcode, thus it can be initialized with a best
-	 *            guess if necessary.
-	 * @param maxNumSetups
-	 *            the highest occurring setup id plus 1. This is only used to
-	 *            compute a hashcode, thus it can be initialized with a best
-	 *            guess if necessary.
 	 * @param maxNumLevels
 	 *            the highest occurring mipmap level plus 1.
 	 * @param numFetcherThreads
 	 */
-	public VolatileGlobalCellCache( final int maxNumTimepoints, final int maxNumSetups, final int maxNumLevels, final int numFetcherThreads )
+	public VolatileGlobalCellCache( final int maxNumLevels, final int numFetcherThreads )
 	{
-		this.maxNumTimepoints = maxNumTimepoints;
-		this.maxNumSetups = maxNumSetups;
 		this.maxNumLevels = maxNumLevels;
 
 		cacheIoTiming = new CacheIoTiming();
