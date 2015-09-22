@@ -463,6 +463,9 @@ public class VolatileGlobalCellCache implements Cache
 		// (BlockingFetchQueues.clear() moves stuff to the prefetchQueue.)
 	}
 
+	/**
+	 * Wraps a {@link CacheArrayLoader} as a {@link VolatileCacheValueLoader}.
+	 */
 	public static class CacheArrayLoaderWrapper< A extends VolatileAccess > implements VolatileCacheValueLoader< Key, VolatileCell< A > >
 	{
 		private final CacheArrayLoader< A > loader;
@@ -487,6 +490,13 @@ public class VolatileGlobalCellCache implements Cache
 		}
 	}
 
+	/**
+	 * A {@link CellCache} that forwards to the {@link VolatileGlobalCellCache}.
+	 *
+	 * @param <A>
+	 *
+	 * @author Tobias Pietzsch &lt;tobias.pietzsch@gmail.com&gt;
+	 */
 	public class VolatileCellCache< A extends VolatileAccess > implements CellCache< A >
 	{
 		private final int timepoint;
